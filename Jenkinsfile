@@ -1,55 +1,62 @@
-pipeline {
 
+pipeline {
     agent any
 
-    stages{
-        stage("Update Ubuntu") {
-            steps{
+    stages {
+
+        stage('Remove Old Snap Docker') {
+            steps {
                 sh '''
-                        sudo apt update
-                        sudo apt-get install -y docker.io docker-compose-v2
-                    '''
+                    if snap list docker >/dev/null 2>&1; then
+                        sudo snap remove docker
+                    fi
+                '''
             }
         }
 
-        stage("Start Docker") {
-            steps{
+        stage('Update Ubuntu') {
+            steps {
                 sh '''
-                        sudo systemctl enable docker
-                        sudo systemctl start docker
-
-                    '''
-
+                    sudo apt update
+                    sudo apt-get install -y docker.io docker-compose-v2
+                '''
             }
         }
 
-        stage("Configure Jenkins Permission"){
-            steps{
+        stage('Start Docker') {
+            steps {
+                sh '''
+                    sudo systemctl enable --now docker
+                '''
+            }
+        }
+
+        stage('Configure Jenkins Permission') {
+            steps {
                 sh '''
                     sudo usermod -aG docker jenkins
-                    '''
+                '''
             }
         }
 
-        stage("Verify Installations") {
-            steps{
+        stage('Verify Installation') {
+            steps {
                 sh '''
                     sudo docker --version
                     sudo docker compose version
                     sudo docker run hello-world
-                    '''
+                '''
             }
         }
     }
 
-        post {
+    post {
         success {
-            echo 'Docker installation completed successfully!'
+            echo 'APT Docker installation completed!'
         }
 
         failure {
             echo 'Docker installation failed. Check console output.'
         }
     }
-
 }
