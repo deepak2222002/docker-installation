@@ -15,7 +15,7 @@ pipeline {
         stage("Start Docker") {
             steps{
                 sh '''
-                        sudo systemctl enables docker
+                        sudo systemctl enable docker
                         sudo systemctl start docker
 
                     '''
