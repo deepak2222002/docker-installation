@@ -26,7 +26,7 @@ pipeline {
         stage("Configure Jenkins Permission"){
             steps{
                 sh '''
-                    sudo usermod -aG docker jenkinss
+                    sudo usermod -aG docker jenkins
                     '''
             }
         }
