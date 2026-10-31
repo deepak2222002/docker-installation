@@ -2,13 +2,21 @@
 pipeline {
     agent any
 
+    options {
+        timestamps()
+        timeout(time: 20, unit: 'MINUTES')
+    }
+
     stages {
 
         stage('Remove Old Snap Docker') {
             steps {
                 sh '''
-                    if snap list docker >/dev/null 2>&1; then
+                    if sudo snap list docker >/dev/null 2>&1; then
+                        echo "Removing old Snap Docker..."
                         sudo snap remove docker
+                    else
+                        echo "Snap Docker is not installed."
                     fi
                 '''
             }
@@ -17,7 +25,7 @@ pipeline {
         stage('Update Ubuntu') {
             steps {
                 sh '''
-                    sudo apt update
+                    sudo apt-get update
                     sudo apt-get install -y docker.io docker-compose-v2
                 '''
             }
@@ -52,7 +60,8 @@ pipeline {
 
     post {
         success {
-            echo 'APT Docker installation completed!'
+            echo 'Fresh APT Docker installation completed!'
+            echo 'Restart Jenkins service after this pipeline completes to apply group changes.'
         }
 
         failure {
