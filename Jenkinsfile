@@ -31,7 +31,7 @@ pipeline {
             }
         }
 
-        staga("Verify Installations") {
+        stage("Verify Installations") {
             steps{
                 sh '''
                     sudo docker --version
